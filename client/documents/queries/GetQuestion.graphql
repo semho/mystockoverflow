@@ -1,0 +1,10 @@
+query GetQuestion($id: Int!) {
+  singleQuestion(id: $id) {
+    title
+    description
+    timestamp
+    createdBy {
+      username
+    }
+  }
+}
