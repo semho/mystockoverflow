@@ -1,0 +1,8 @@
+mutation CreateQuestion($title: String!, $description: String) {
+  createQuestion(title: $title, description: $description) {
+    question {
+      id
+      title
+    }
+  }
+}

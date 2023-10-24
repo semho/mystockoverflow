@@ -26,7 +26,7 @@ export function Navbar() {
           <LinkMenu href="/ask-question" label="Задать вопрос" />
         </div>
         <div className="flex gap-2">
-          <LinkMenu href="/active" label="Моя активность" />
+          <LinkMenu href="/my-activity" label="Моя активность" />
         </div>
       </div>
 

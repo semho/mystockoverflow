@@ -1,0 +1,15 @@
+mutation UpdateQuestion(
+  $questionId: ID!
+  $title: String
+  $description: String
+) {
+  updateQuestion(
+    questionId: $questionId
+    title: $title
+    description: $description
+  ) {
+    question {
+      id
+    }
+  }
+}

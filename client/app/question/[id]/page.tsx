@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card"
 
 import type { Metadata } from "next"
+import { Button } from "@/components/ui/button"
+import { Dialog } from "@/components/Dialog"
 
 type Props = {
   params: { id: string }
@@ -56,8 +58,19 @@ export default async function Page({
       <CardHeader>
         <CardTitle>{question?.title}</CardTitle>
         <CardDescription>
-          Автор: {question?.createdBy.username} от{" "}
-          {new Date(question?.timestamp).toLocaleDateString("ru-RU")}
+          <span className="mr-2">
+            {" "}
+            Автор: {question?.createdBy.username} от{" "}
+            {new Date(question?.timestamp).toLocaleDateString("ru-RU")}
+          </span>
+          <Dialog
+            value="Редактировать"
+            title="Что Вы хотите изменить в вопросе?"
+            description="После измений, подтвердите их"
+          />
+          <Button type="button" variant={"destructive"}>
+            Удалить
+          </Button>
         </CardDescription>
       </CardHeader>
       <CardContent>

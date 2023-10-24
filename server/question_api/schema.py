@@ -19,7 +19,7 @@ class Query(graphene.ObjectType):
     single_question = graphene.Field(QuestionType, id=graphene.Int(required=True))
 
     def resolve_questions(self, info, **kwargs):
-        return Question.objects.all()
+        return Question.objects.all().order_by("-timestamp")
 
     def resolve_single_question(self, info, id):
         try:
@@ -74,6 +74,33 @@ class CreateAnswer(graphene.Mutation):
         return CreateAnswer(answer=answer)
 
 
+class UpdateQuestion(graphene.Mutation):
+    question = graphene.Field(QuestionType)
+
+    class Arguments:
+        question_id = graphene.ID(required=True)
+        title = graphene.String()
+        description = graphene.String()
+
+    def mutate(self, info, question_id, title=None, description=None):
+        question = Question.objects.get(pk=question_id)
+
+        user = info.context.user
+        if user.is_anonymous:
+            return Exception("You must Log in to update a question")
+        if question.created_by != user:
+            return Exception("You do not have permission to update this question")
+
+        if title is not None:
+            question.title = title
+        if description is not None:
+            question.description = description
+        question.save()
+
+        return UpdateQuestion(question=question)
+
+
 class Mutation(graphene.ObjectType):
     create_question = CreateQuestion.Field()
+    update_question = UpdateQuestion.Field()
     create_answer = CreateAnswer.Field()

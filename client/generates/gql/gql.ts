@@ -13,6 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "mutation CreateQuestion($title: String!, $description: String) {\n  createQuestion(title: $title, description: $description) {\n    question {\n      id\n      title\n    }\n  }\n}": types.CreateQuestionDocument,
+    "mutation UpdateQuestion($questionId: ID!, $title: String, $description: String) {\n  updateQuestion(\n    questionId: $questionId\n    title: $title\n    description: $description\n  ) {\n    question {\n      id\n    }\n  }\n}": types.UpdateQuestionDocument,
     "query GetQuestion($id: Int!) {\n  singleQuestion(id: $id) {\n    title\n    description\n    timestamp\n    createdBy {\n      username\n    }\n  }\n}": types.GetQuestionDocument,
     "query GetQuestions {\n  questions {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n}": types.GetQuestionsDocument,
 };
@@ -31,6 +33,14 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation CreateQuestion($title: String!, $description: String) {\n  createQuestion(title: $title, description: $description) {\n    question {\n      id\n      title\n    }\n  }\n}"): (typeof documents)["mutation CreateQuestion($title: String!, $description: String) {\n  createQuestion(title: $title, description: $description) {\n    question {\n      id\n      title\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation UpdateQuestion($questionId: ID!, $title: String, $description: String) {\n  updateQuestion(\n    questionId: $questionId\n    title: $title\n    description: $description\n  ) {\n    question {\n      id\n    }\n  }\n}"): (typeof documents)["mutation UpdateQuestion($questionId: ID!, $title: String, $description: String) {\n  updateQuestion(\n    questionId: $questionId\n    title: $title\n    description: $description\n  ) {\n    question {\n      id\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
