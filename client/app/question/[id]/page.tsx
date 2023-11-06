@@ -1,7 +1,4 @@
-import {
-  GetQuestionDocument,
-  GetQuestionsDocument,
-} from "@/generates/gql/graphql"
+import { GetQuestionDocument } from "@/generates/gql/graphql"
 import { client } from "@/lib/requestClient"
 import {
   Card,
@@ -14,9 +11,6 @@ import {
 import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { DialogBox } from "@/components/DialogBox"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { QuestionFormUpdate } from "@/components/QuestionFormUpdate"
 
 type Props = {

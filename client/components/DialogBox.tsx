@@ -1,5 +1,4 @@
 "use client"
-
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useDialogButtonStore from "@/store/dialog"
-
 type Props = {
   value: string
   title: string
