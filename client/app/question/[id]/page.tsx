@@ -50,7 +50,6 @@ export default async function Page({
   params: { id: number }
 }) {
   const question = await getQuestion(id)
-
   return (
     <Card className="mb-5">
       <CardHeader>

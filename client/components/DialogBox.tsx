@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useDialogButtonStore from "@/store/dialog"
+import { useEffect, useRef } from "react"
 type Props = {
   value: string
   title: string
@@ -25,14 +26,21 @@ export function DialogBox({
   description,
   children,
 }: Props) {
-  const setSubmitButtonClicked = useDialogButtonStore(
-    (state) => state.setSubmitButtonClicked,
-  )
+  const [isDialogOpen, setDialogOpen, setSubmitButtonClicked] =
+    useDialogButtonStore((state) => [
+      state.isDialogOpen,
+      state.setDialogOpen,
+      state.setSubmitButtonClicked,
+    ])
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="mr-2">
+        <Button
+          variant="outline"
+          className="mr-2"
+          onClick={() => setDialogOpen(true)}
+        >
           {value}
         </Button>
       </DialogTrigger>

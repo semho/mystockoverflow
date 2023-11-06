@@ -8,6 +8,7 @@ import useDialogButtonStore from "@/store/dialog"
 import { ZodError, z } from "zod"
 import { client } from "@/lib/requestClient"
 import { UpdateQuestionDocument } from "@/generates/gql/graphql"
+import { useRouter } from "next/navigation"
 
 type FormProps = {
   id: number
@@ -55,9 +56,12 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
   const [textareaError, setTextareaError] = useState("")
   const [IDError, setIDError] = useState("")
 
-  const [isSubmitButtonClicked, setSubmitButtonClicked] = useDialogButtonStore(
-    (state) => [state.isSubmitButtonClicked, state.setSubmitButtonClicked],
-  )
+  const [isSubmitButtonClicked, setSubmitButtonClicked, setDialogOpen] =
+    useDialogButtonStore((state) => [
+      state.isSubmitButtonClicked,
+      state.setSubmitButtonClicked,
+      state.setDialogOpen,
+    ])
 
   const handleSubmit = async () => {
     try {
@@ -67,8 +71,8 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
         description: textareaValue,
       })
       //после валидации отправляем запрос на обновление вопроса
-      await updateQuestion(id.toString(), title, description)
-
+      await updateQuestion(id.toString(), inputValue, textareaValue)
+      setDialogOpen(false)
       //сбрасываем ошибки
       setInputError("")
       setTextareaError("")
