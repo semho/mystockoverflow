@@ -18,7 +18,7 @@ type Props = {
   description?: string
 }
 
-export function Dialog({ value, title, description }: Props) {
+export function MyAlertDialog({ value, title, description }: Props) {
   return (
     <AlertDialog>
       <AlertDialogTrigger

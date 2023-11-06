@@ -13,7 +13,11 @@ import {
 
 import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
-import { Dialog } from "@/components/Dialog"
+import { DialogBox } from "@/components/DialogBox"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { QuestionFormUpdate } from "@/components/QuestionFormUpdate"
 
 type Props = {
   params: { id: string }
@@ -63,11 +67,19 @@ export default async function Page({
             Автор: {question?.createdBy.username} от{" "}
             {new Date(question?.timestamp).toLocaleDateString("ru-RU")}
           </span>
-          <Dialog
-            value="Редактировать"
-            title="Что Вы хотите изменить в вопросе?"
-            description="После измений, подтвердите их"
-          />
+          <DialogBox
+            value="Редактирование"
+            title="Редактирование вопроса"
+            description="Подтвердите изменения после их добавления"
+          >
+            {question && (
+              <QuestionFormUpdate
+                id={id}
+                title={question.title}
+                description={question.description}
+              />
+            )}
+          </DialogBox>
           <Button type="button" variant={"destructive"}>
             Удалить
           </Button>
