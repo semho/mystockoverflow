@@ -1,19 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/textarea"
 import useDialogButtonStore from "@/store/dialog"
 import { ZodError, z } from "zod"
 import { client } from "@/lib/requestClient"
-import { UpdateQuestionDocument } from "@/generates/gql/graphql"
+import {
+  GetQuestionDocument,
+  UpdateQuestionDocument,
+} from "@/generates/gql/graphql"
 import { useRouter } from "next/navigation"
-
 type FormProps = {
   id: number
   title: string
   description: string
+  onUpdateSuccess: (newTitle: string, newDescription: string) => Promise<void>
 }
 
 const formSchema = z.object({
@@ -49,6 +52,7 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
   id,
   title,
   description,
+  onUpdateSuccess,
 }) => {
   const [inputValue, setInputValue] = useState(title)
   const [textareaValue, setTextareaValue] = useState(description)
@@ -63,6 +67,8 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
       state.setDialogOpen,
     ])
 
+  const router = useRouter()
+
   const handleSubmit = async () => {
     try {
       formSchema.parse({
@@ -73,6 +79,11 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
       //после валидации отправляем запрос на обновление вопроса
       await updateQuestion(id.toString(), inputValue, textareaValue)
       setDialogOpen(false)
+      await client.request(GetQuestionDocument, {
+        id: Number(id),
+      })
+      router.refresh
+      onUpdateSuccess(inputValue, textareaValue)
       //сбрасываем ошибки
       setInputError("")
       setTextareaError("")
