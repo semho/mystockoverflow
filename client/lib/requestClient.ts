@@ -9,8 +9,15 @@ import { url } from "inspector"
 //   ),
 //   cache: "no-store",
 // })
+
+const token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjk5NDIwNDYxLCJvcmlnSWF0IjoxNjk5NDIwMTYxfQ._eD7jvWIDWOdIp-7whTCakyFVJLjYP734MQkDs4PRVY"
+
 export const client = new GraphQLClient(GRAPH_ENDPOINT, {
   credentials: "include",
+  headers: {
+    Authorization: `JWT ${token}`,
+  },
   next: { revalidate: 1 },
   cache: "no-store",
 })
