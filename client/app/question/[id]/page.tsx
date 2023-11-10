@@ -1,7 +1,7 @@
 import { GetQuestionDocument } from "@/generates/gql/graphql"
 import { client } from "@/lib/requestClient"
 import type { Metadata } from "next"
-import QuestionDetail from "@/components/QuestionDetail"
+import QuestionDetail from "@/components/question/QuestionDetail"
 
 type Props = {
   params: { id: string }

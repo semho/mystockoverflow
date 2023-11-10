@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import useDialogButtonStore from "@/store/dialog"
-import { useEffect, useRef } from "react"
 type Props = {
   value: string
   title: string

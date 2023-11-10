@@ -1,4 +1,4 @@
-import Auth from "@/components/Auth"
+import TabsAuth from "@/components/auth/TabsAuth"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export default async function Page() {
     <div className="flex items-center justify-center h-screen">
       <div className="flex items-center justify-center h-[70%]">
         <div className="self-start">
-          <Auth />
+          <TabsAuth />
         </div>
       </div>
     </div>

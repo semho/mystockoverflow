@@ -8,9 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { GetQuestionQuery } from "@/generates/gql/graphql"
-import { DialogBox } from "./DialogBox"
+import { DialogBox } from "../DialogBox"
 import { QuestionFormUpdate } from "./QuestionFormUpdate"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import { useEffect, useState } from "react"
 
 type Props = {

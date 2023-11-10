@@ -1,4 +1,4 @@
-import QuestionsList from "@/components/QuestionsList"
+import QuestionsList from "@/components/question/QuestionsList"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {

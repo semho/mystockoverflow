@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useReducer, useState } from "react"
-import { Label } from "./ui/label"
-import { Input } from "./ui/input"
-import { Textarea } from "./ui/textarea"
+import { Label } from "../ui/label"
+import { Input } from "../ui/input"
+import { Textarea } from "../ui/textarea"
 import useDialogButtonStore from "@/store/dialog"
 import { ZodError, z } from "zod"
 import { client } from "@/lib/requestClient"
