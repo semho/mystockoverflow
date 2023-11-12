@@ -1,9 +1,9 @@
 import { GetQuestionsDocument } from "@/generates/gql/graphql"
-import { client } from "@/lib/requestClient"
+import createGraphQLClient from "@/lib/requestClient"
 import Question from "./Question"
 
 async function getQuestions() {
-  return await client.request(GetQuestionsDocument)
+  return await createGraphQLClient().request(GetQuestionsDocument)
 }
 
 export default async function QuestionsList() {

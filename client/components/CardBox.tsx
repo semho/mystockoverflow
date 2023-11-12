@@ -1,11 +1,8 @@
 "use client"
-import { Button } from "@/components/ui/button"
-
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "./ui/card"
