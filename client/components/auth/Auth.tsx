@@ -12,6 +12,9 @@ import {
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { client } from "@/lib/requestClient"
+import { TokenAuthDocument } from "@/generates/gql/graphql"
+import useUserStore from "@/store/user"
 
 const formSchema = z.object({
   login: z
@@ -22,15 +25,34 @@ const formSchema = z.object({
     .max(20, {
       message: "Логин должен содержать максимум 20 символов",
     }),
-  pass: z.string().min(6, {
-    message: "Пароль должен содержать минимум 6 символов",
+  pass: z.string().min(5, {
+    message: "Пароль должен содержать минимум 5 символов",
   }),
 })
 
+async function getToken(login: string, password: string) {
+  try {
+    const response = await client.request(TokenAuthDocument, {
+      password,
+      login,
+    })
+    return response
+  } catch (error) {
+    console.error("GraphQL Request Error:", error)
+    throw error
+  }
+}
+
 async function onSubmit(values: z.infer<typeof formSchema>) {
-  console.log("авторизация")
-  console.log(`логин: ${values.login}, пароль: ${values.pass}`)
   formSchema.parse({ login: values.login, pass: values.pass })
+
+  const res = await getToken(values.login, values.pass)
+
+  res &&
+    useUserStore.setState({
+      token: res.tokenAuth?.token,
+      user: res.tokenAuth?.payload,
+    })
 }
 
 export default function Auth() {

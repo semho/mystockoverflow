@@ -1,8 +1,7 @@
-import { Label } from "@radix-ui/react-label"
 import { Input } from "../ui/input"
 import { CardBox } from "../CardBox"
 import { Button } from "../ui/button"
-import { ZodError, z } from "zod"
+import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -26,20 +25,20 @@ const formSchema = z
       }),
     pass: z
       .string()
-      .min(6, {
-        message: "Пароль должен содержать минимум 6 символов",
+      .min(5, {
+        message: "Пароль должен содержать минимум 5 символов",
       })
       .optional(),
     repeatPass: z
       .string()
-      .min(6, {
-        message: "Повтор пароля должен содержать минимум 6 символов",
+      .min(5, {
+        message: "Повтор пароля должен содержать минимум 5 символов",
       })
       .optional(),
   })
   .refine((data) => {
     const { pass, repeatPass } = data
-    if (repeatPass && repeatPass.length >= 6 && pass !== repeatPass) {
+    if (repeatPass && repeatPass.length >= 5 && pass !== repeatPass) {
       const error: any = new Error("Пароли не совпадают")
       error.errors = [
         {
