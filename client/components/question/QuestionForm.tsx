@@ -17,7 +17,9 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { CreateQuestionDocument } from "@/generates/gql/graphql"
-import { client } from "@/lib/requestClient"
+import createGraphQLClient from "@/lib/requestClient"
+import { useState } from "react"
+import { useSession } from "next-auth/react"
 
 const formSchema = z.object({
   title: z
@@ -32,7 +34,9 @@ const formSchema = z.object({
 })
 
 export function QuestionForm() {
+  const [error, setError] = useState("")
   const router = useRouter()
+  const session = useSession()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,26 +46,51 @@ export function QuestionForm() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await createQuestion(values.title, values.description)
-    router.push("/")
+    const res = await createQuestion(values.title, values.description)
+    if (res) {
+      router.push("/")
+    }
   }
 
   async function createQuestion(title: string, description: string) {
     try {
-      const response = await client.request(CreateQuestionDocument, {
-        title,
-        description,
-      })
+      const token = session.data?.user.tokenAuth.token
+      if (!token) {
+        const tokenError = new z.ZodError([
+          {
+            code: "custom",
+            path: ["token"],
+            message:
+              "Отсутствует токен пользователя или закончился его срок действия. Авторизуйтесь повторно",
+          },
+        ])
+        throw tokenError
+      }
+
+      const response = await createGraphQLClient(token).request(
+        CreateQuestionDocument,
+        {
+          title,
+          description,
+        },
+      )
+      setError("")
       return response
     } catch (error) {
-      console.error("GraphQL Request Error:", error)
-      throw error
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          if (err.path[0] === "token") {
+            setError(err.message)
+          }
+        })
+      }
     }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {error && <div className="text-red-500 text-xs ">{error}</div>}
         <FormField
           control={form.control}
           name="title"

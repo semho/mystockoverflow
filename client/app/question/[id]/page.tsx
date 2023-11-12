@@ -1,5 +1,5 @@
 import { GetQuestionDocument } from "@/generates/gql/graphql"
-import { client } from "@/lib/requestClient"
+import createGraphQLClient from "@/lib/requestClient"
 import type { Metadata } from "next"
 import QuestionDetail from "@/components/question/QuestionDetail"
 
@@ -17,9 +17,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 async function getQuestion(id: number) {
-  const { singleQuestion } = await client.request(GetQuestionDocument, {
-    id: Number(id),
-  })
+  const { singleQuestion } = await createGraphQLClient().request(
+    GetQuestionDocument,
+    {
+      id: Number(id),
+    },
+  )
 
   return singleQuestion
 }

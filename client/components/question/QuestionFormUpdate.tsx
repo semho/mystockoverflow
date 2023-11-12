@@ -6,12 +6,14 @@ import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import useDialogButtonStore from "@/store/dialog"
 import { ZodError, z } from "zod"
-import { client } from "@/lib/requestClient"
+import createGraphQLClient from "@/lib/requestClient"
 import {
   GetQuestionDocument,
   UpdateQuestionDocument,
 } from "@/generates/gql/graphql"
 import { useRouter } from "next/navigation"
+import useUserStore from "@/store/user"
+import { useSession } from "next-auth/react"
 type FormProps = {
   id: number
   title: string
@@ -34,13 +36,18 @@ async function updateQuestion(
   questionId: string,
   title: string,
   description: string,
+  token: string,
 ) {
   try {
-    const response = await client.request(UpdateQuestionDocument, {
-      questionId,
-      title,
-      description,
-    })
+    const response = await createGraphQLClient(token).request(
+      UpdateQuestionDocument,
+      {
+        questionId,
+        title,
+        description,
+      },
+    )
+
     return response
   } catch (error) {
     console.error("GraphQL Request Error:", error)
@@ -68,6 +75,7 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
     ])
 
   const router = useRouter()
+  const session = useSession()
 
   const handleSubmit = async () => {
     try {
@@ -76,12 +84,27 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
         title: inputValue,
         description: textareaValue,
       })
-      //после валидации отправляем запрос на обновление вопроса
-      await updateQuestion(id.toString(), inputValue, textareaValue)
+
+      const token = session.data?.user.tokenAuth.token
+      if (!token) {
+        const tokenError = new z.ZodError([
+          {
+            code: "custom",
+            path: ["id"],
+            message:
+              "Отсутствует токен пользователя или закончился его срок действия. Авторизуйтесь повторно",
+          },
+        ])
+        throw tokenError
+      }
+
+      await updateQuestion(id.toString(), inputValue, textareaValue, token)
       setDialogOpen(false)
-      await client.request(GetQuestionDocument, {
+
+      await createGraphQLClient().request(GetQuestionDocument, {
         id: Number(id),
       })
+
       router.refresh
       onUpdateSuccess(inputValue, textareaValue)
       //сбрасываем ошибки
@@ -90,7 +113,6 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
       setIDError("")
     } catch (error) {
       if (error instanceof ZodError) {
-        // console.error("Ошибки валидации:", error.errors)
         error.errors.forEach((err) => {
           if (err.path[0] === "title") {
             setInputError(err.message)
@@ -99,7 +121,11 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
             setTextareaError(err.message)
           }
           if (err.path[0] === "id") {
-            setIDError("ID не соответствует требованиям")
+            if (err.code === "custom") {
+              setIDError(err.message)
+            } else {
+              setIDError("ID не соответствует требованиям")
+            }
           }
         })
       }
@@ -112,12 +138,12 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
       //сбрасываем состояние кнопки
       setSubmitButtonClicked(false)
     }
-  }, [isSubmitButtonClicked, inputValue, textareaValue])
+  }, [isSubmitButtonClicked, inputValue, textareaValue, useUserStore])
 
   return (
     <form>
       <div className="space-y-2">
-        {IDError && <div className="text-red-500">{IDError}</div>}
+        {IDError && <div className="text-red-500 text-xs">{IDError}</div>}
         <Label
           htmlFor="name"
           className={`text-right ${inputError ? "text-red-500 " : ""}`}
@@ -134,12 +160,13 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
       </div>
       <div className="space-y-2">
         <Label
-          htmlFor="username"
+          htmlFor="description"
           className={`text-right ${textareaError ? "text-red-500 " : ""}`}
         >
           Описание
         </Label>
         <Textarea
+          id="description"
           rows={10}
           value={textareaValue}
           onChange={(e) => setTextareaValue(e.target.value)}

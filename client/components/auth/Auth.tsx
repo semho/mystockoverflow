@@ -12,7 +12,7 @@ import {
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { client } from "@/lib/requestClient"
+import createGraphQLClient from "@/lib/requestClient"
 import { TokenAuthDocument } from "@/generates/gql/graphql"
 import useUserStore from "@/store/user"
 
@@ -32,7 +32,7 @@ const formSchema = z.object({
 
 async function getToken(login: string, password: string) {
   try {
-    const response = await client.request(TokenAuthDocument, {
+    const response = await createGraphQLClient().request(TokenAuthDocument, {
       password,
       login,
     })
