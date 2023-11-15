@@ -86,7 +86,7 @@ export default function Reg() {
             name="login"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Login</FormLabel>
+                <FormLabel>Логин</FormLabel>
                 <FormControl>
                   <Input placeholder="Pedro Duarte" {...field} />
                 </FormControl>
@@ -99,7 +99,7 @@ export default function Reg() {
             name="pass"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Пароль</FormLabel>
                 <FormControl>
                   <Input type="password" placeholder="******" {...field} />
                 </FormControl>
@@ -112,7 +112,7 @@ export default function Reg() {
             name="repeatPass"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat password</FormLabel>
+                <FormLabel>Подтвердите пароль</FormLabel>
                 <FormControl>
                   <Input type="password" placeholder="******" {...field} />
                 </FormControl>

@@ -1,11 +1,16 @@
 import { TokenAuthDocument } from "@/generates/gql/graphql"
 import createGraphQLClient from "@/lib/requestClient"
-import useUserStore from "@/store/user"
 import type { AuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoggleProvider from "next-auth/providers/google"
 
 export const authConfig: AuthOptions = {
+  pages: {
+    signIn: "/login",
+  },
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     CredentialsProvider({
       // The name to display on the sign in form (e.g. 'Sign in with...')
@@ -26,9 +31,13 @@ export const authConfig: AuthOptions = {
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
 
+        if (!credentials?.username || !credentials.password) {
+          return null
+        }
+
         const user = await createGraphQLClient().request(TokenAuthDocument, {
-          password: credentials!.password,
-          login: credentials!.username,
+          password: credentials.password,
+          login: credentials.username,
         })
 
         // If no error and we have user data, return it

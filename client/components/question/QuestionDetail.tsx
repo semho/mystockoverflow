@@ -12,6 +12,7 @@ import { DialogBox } from "../DialogBox"
 import { QuestionFormUpdate } from "./QuestionFormUpdate"
 import { Button } from "../ui/button"
 import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
 
 type Props = {
   question: NonNullable<GetQuestionQuery["singleQuestion"]>
@@ -23,6 +24,8 @@ export default function QuestionDetail({ question, id }: Props) {
   const [updatedDescription, setUpdatedDescription] = useState(
     question?.description,
   )
+  const [isAuthState, setIsAuthState] = useState(false)
+  const session = useSession()
 
   const handleUpdateQuestion = async (
     newTitle: string,
@@ -36,8 +39,11 @@ export default function QuestionDetail({ question, id }: Props) {
     if (question) {
       setUpdatedTitle(question.title)
       setUpdatedDescription(question.description)
+      if (session.data) {
+        setIsAuthState(true)
+      }
     }
-  }, [question])
+  }, [question, session])
 
   return (
     <Card className="mb-5">
@@ -49,23 +55,25 @@ export default function QuestionDetail({ question, id }: Props) {
             Автор: {question?.createdBy.username} от{" "}
             {new Date(question?.timestamp).toLocaleDateString("ru-RU")}
           </span>
-          <DialogBox
-            value="Редактирование"
-            title="Редактирование вопроса"
-            description="Подтвердите изменения после их добавления"
-          >
-            {question && (
+          {question && isAuthState && (
+            <DialogBox
+              value="Редактирование"
+              title="Редактирование вопроса"
+              description="Подтвердите изменения после их добавления"
+            >
               <QuestionFormUpdate
                 id={id}
                 title={question.title}
                 description={question.description}
                 onUpdateSuccess={handleUpdateQuestion}
               />
-            )}
-          </DialogBox>
-          <Button type="button" variant={"destructive"}>
-            Удалить
-          </Button>
+            </DialogBox>
+          )}
+          {isAuthState && (
+            <Button type="button" variant={"destructive"}>
+              Удалить
+            </Button>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
