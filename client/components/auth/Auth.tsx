@@ -1,3 +1,5 @@
+"use client"
+
 import { Input } from "../ui/input"
 import { CardBox } from "../CardBox"
 import { Button } from "../ui/button"
@@ -12,9 +14,9 @@ import {
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import createGraphQLClient from "@/lib/requestClient"
-import { TokenAuthDocument } from "@/generates/gql/graphql"
-import useUserStore from "@/store/user"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
+import { signIn } from "next-auth/react"
 
 const formSchema = z.object({
   login: z
@@ -30,31 +32,6 @@ const formSchema = z.object({
   }),
 })
 
-async function getToken(login: string, password: string) {
-  try {
-    const response = await createGraphQLClient().request(TokenAuthDocument, {
-      password,
-      login,
-    })
-    return response
-  } catch (error) {
-    console.error("GraphQL Request Error:", error)
-    throw error
-  }
-}
-
-async function onSubmit(values: z.infer<typeof formSchema>) {
-  formSchema.parse({ login: values.login, pass: values.pass })
-
-  const res = await getToken(values.login, values.pass)
-
-  res &&
-    useUserStore.setState({
-      token: res.tokenAuth?.token,
-      user: res.tokenAuth?.payload,
-    })
-}
-
 export default function Auth() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,6 +41,37 @@ export default function Auth() {
     },
   })
 
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/"
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true)
+      formSchema.parse({ login: values.login, pass: values.pass })
+
+      const res = await signIn("credentials", {
+        redirect: false,
+        username: values.login,
+        password: values.pass,
+        callbackUrl,
+      })
+      setLoading(false)
+
+      if (!res?.error) {
+        router.push(callbackUrl)
+      } else {
+        setError("Неверный логин или пароль")
+      }
+    } catch (error: any) {
+      setLoading(false)
+      setError(error)
+    }
+  }
+
   return (
     <CardBox
       title="Авторизация"
@@ -71,12 +79,15 @@ export default function Auth() {
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {error && (
+            <p className="text-center bg-red-300 py-4 mb-6 rounded">{error}</p>
+          )}
           <FormField
             control={form.control}
             name="login"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Login</FormLabel>
+                <FormLabel>Логин</FormLabel>
                 <FormControl>
                   <Input placeholder="Pedro Duarte" {...field} />
                 </FormControl>
@@ -89,7 +100,7 @@ export default function Auth() {
             name="pass"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Пароль</FormLabel>
                 <FormControl>
                   <Input type="password" placeholder="******" {...field} />
                 </FormControl>
@@ -97,7 +108,9 @@ export default function Auth() {
               </FormItem>
             )}
           />
-          <Button type="submit">Войти</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "загрузка..." : "Войти"}
+          </Button>
         </form>
       </Form>
     </CardBox>

@@ -21,6 +21,9 @@ class CreateUser(graphene.Mutation):
         password = graphene.String(required=True)
 
     def mutate(self, info, username, email, password):
+        existing_user = User.objects.filter(email=email).first()
+        if existing_user:
+            raise ValueError("Пользователь с таким email уже зарегистрирован")
         user = User(username=username, email=email)
         user.set_password(password)
         user.save()
