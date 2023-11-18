@@ -15,7 +15,17 @@ type Props = {
   title: string
   valueSubmit?: string
   description?: string
+  buttonVarian?:
+    | "default"
+    | "link"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | null
+    | undefined
   children: React.ReactNode
+  dialogId: string
 }
 
 export function DialogBox({
@@ -23,22 +33,37 @@ export function DialogBox({
   title,
   valueSubmit = "Сохранить изменения",
   description,
+  buttonVarian = "outline",
   children,
+  dialogId,
 }: Props) {
-  const [isDialogOpen, setDialogOpen, setSubmitButtonClicked] =
-    useDialogButtonStore((state) => [
-      state.isDialogOpen,
-      state.setDialogOpen,
+  const [isSubmitButtonClicked, setSubmitButtonClicked] = useDialogButtonStore(
+    (state) => [
+      state.isSubmitButtonClicked[dialogId],
       state.setSubmitButtonClicked,
-    ])
+    ],
+  )
+
+  const [dialogs, setDialogOpen] = useDialogButtonStore((state) => [
+    state.dialogs,
+    state.setDialogOpen,
+  ])
+
+  const dialog = dialogs[dialogId]
+  if (!dialog) {
+    return null
+  }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog
+      open={dialogs[dialogId].isOpen}
+      onOpenChange={(value) => setDialogOpen(dialogId, value)}
+    >
       <DialogTrigger asChild>
         <Button
-          variant="outline"
+          variant={buttonVarian}
           className="mr-2"
-          onClick={() => setDialogOpen(true)}
+          onClick={() => setDialogOpen(dialogId, true)}
         >
           {value}
         </Button>
@@ -50,7 +75,10 @@ export function DialogBox({
         </DialogHeader>
         <div className="grid gap-4 py-2">{children}</div>
         <DialogFooter>
-          <Button type="submit" onClick={() => setSubmitButtonClicked(true)}>
+          <Button
+            type="submit"
+            onClick={() => setSubmitButtonClicked(dialogId, true)}
+          >
             {valueSubmit}
           </Button>
         </DialogFooter>

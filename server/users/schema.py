@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
+from graphql import GraphQLError
 import graphql_jwt
 
 
@@ -44,7 +45,7 @@ class Query(graphene.ObjectType):
     def resolve_user(self, info):
         user = info.context.user
         if user.is_anonymous:
-            return Exception("Not authenticated")
+            return GraphQLError("Not authenticated")
         return user
 
 

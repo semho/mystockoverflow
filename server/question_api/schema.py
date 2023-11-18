@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphql import GraphQLError
 from .models import Question, Answer
 
 
@@ -50,7 +51,7 @@ class CreateQuestion(graphene.Mutation):
     def mutate(self, info, title, description):
         user = info.context.user
         if user.is_anonymous:
-            return Exception("You must Log in to create a new question")
+            return GraphQLError("You must Log in to create a new question")
         question = Question(title=title, description=description, created_by=user)
         question.save()
 
@@ -67,7 +68,7 @@ class CreateAnswer(graphene.Mutation):
         user = info.context.user
         question = info.context.question
         if user.is_anonymous:
-            return Exception("You must Log in to create a new answer")
+            return GraphQLError("You must Log in to create a new answer")
         answer = Answer(question=question, posted_by=user, answer=answer)
         answer.save()
 
@@ -83,13 +84,16 @@ class UpdateQuestion(graphene.Mutation):
         description = graphene.String()
 
     def mutate(self, info, question_id, title=None, description=None):
-        question = Question.objects.get(pk=question_id)
+        try:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise GraphQLError("Record not found")
 
         user = info.context.user
         if user.is_anonymous:
-            return Exception("You must Log in to update a question")
+            return GraphQLError("You must Log in to update a question")
         if question.created_by != user:
-            return Exception("You do not have permission to update this question")
+            return GraphQLError("You do not have permission to update this question")
 
         if title is not None:
             question.title = title
@@ -100,7 +104,31 @@ class UpdateQuestion(graphene.Mutation):
         return UpdateQuestion(question=question)
 
 
+class DeleteQuestion(graphene.Mutation):
+    question = graphene.Field(QuestionType)
+
+    class Arguments:
+        question_id = graphene.ID(required=True)
+
+    def mutate(self, info, question_id):
+        try:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise GraphQLError("Record not found")
+
+        user = info.context.user
+        if user.is_anonymous:
+            return GraphQLError("You must Log in to update a question")
+        if question.created_by != user:
+            return GraphQLError("You do not have permission to update this question")
+
+        question.delete()
+
+        return DeleteQuestion(question=None)
+
+
 class Mutation(graphene.ObjectType):
     create_question = CreateQuestion.Field()
     update_question = UpdateQuestion.Field()
+    delete_question = DeleteQuestion.Field()
     create_answer = CreateAnswer.Field()

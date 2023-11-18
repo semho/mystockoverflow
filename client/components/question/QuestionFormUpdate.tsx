@@ -18,6 +18,7 @@ type FormProps = {
   id: number
   title: string
   description: string
+  dialogId: string
   onUpdateSuccess: (newTitle: string, newDescription: string) => Promise<void>
 }
 
@@ -60,6 +61,7 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
   title,
   description,
   onUpdateSuccess,
+  dialogId,
 }) => {
   const [inputValue, setInputValue] = useState(title)
   const [textareaValue, setTextareaValue] = useState(description)
@@ -67,12 +69,14 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
   const [textareaError, setTextareaError] = useState("")
   const [IDError, setIDError] = useState("")
 
-  const [isSubmitButtonClicked, setSubmitButtonClicked, setDialogOpen] =
-    useDialogButtonStore((state) => [
-      state.isSubmitButtonClicked,
+  const [setDialogOpen] = useDialogButtonStore((state) => [state.setDialogOpen])
+
+  const [isSubmitButtonClicked, setSubmitButtonClicked] = useDialogButtonStore(
+    (state) => [
+      state.isSubmitButtonClicked[dialogId],
       state.setSubmitButtonClicked,
-      state.setDialogOpen,
-    ])
+    ],
+  )
 
   const router = useRouter()
   const session = useSession()
@@ -99,7 +103,7 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
       }
 
       await updateQuestion(id.toString(), inputValue, textareaValue, token)
-      setDialogOpen(false)
+      setDialogOpen(dialogId, false)
 
       await createGraphQLClient().request(GetQuestionDocument, {
         id: Number(id),
@@ -136,7 +140,7 @@ export const QuestionFormUpdate: React.FC<FormProps> = ({
     if (isSubmitButtonClicked) {
       handleSubmit()
       //сбрасываем состояние кнопки
-      setSubmitButtonClicked(false)
+      setSubmitButtonClicked(dialogId, false)
     }
   }, [isSubmitButtonClicked, inputValue, textareaValue, useUserStore])
 
