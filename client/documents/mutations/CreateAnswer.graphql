@@ -1,0 +1,12 @@
+mutation CreateAnswer($comment: String!, $questionId: ID!) {
+  createAnswer(answer: $comment, questionId: $questionId) {
+    answer {
+      id
+      answer
+      timestamp
+      postedBy {
+        username
+      }
+    }
+  }
+}

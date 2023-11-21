@@ -26,3 +26,21 @@ export interface DeleteQuestionResponse {
       | undefined
   } | null
 }
+
+export interface DeleteAnswerResponse {
+  deleteAnswer?: {
+    answer?: {
+      id: string
+    } | null
+    errors?:
+      | {
+          message: string
+          locations: {
+            line: number
+            column: number
+          }[]
+          path: string[]
+        }[]
+      | undefined
+  } | null
+}

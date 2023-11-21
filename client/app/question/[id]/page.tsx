@@ -2,6 +2,7 @@ import { GetQuestionDocument } from "@/generates/gql/graphql"
 import createGraphQLClient from "@/lib/requestClient"
 import type { Metadata } from "next"
 import QuestionDetail from "@/components/question/QuestionDetail"
+import AnswersList from "@/components/answer/AnswersList"
 
 type Props = {
   params: { id: string }
@@ -48,5 +49,10 @@ export default async function Page({
     return <div>Вопрос не найден</div>
   }
 
-  return <QuestionDetail question={question} id={id} />
+  return (
+    <>
+      <QuestionDetail question={question} id={id} />
+      <AnswersList questionId={id} />
+    </>
+  )
 }

@@ -18,11 +18,10 @@ import { useSession } from "next-auth/react"
 import useDialogButtonStore from "@/store/dialog"
 import createGraphQLClient from "@/lib/requestClient"
 import { useRouter } from "next/navigation"
-import { unknown } from "zod"
 import {
   DeleteQuestionResponse,
   GraphQLResponseError,
-} from "@/interfaces/question"
+} from "@/interfaces/rersponse"
 
 type Props = {
   question: NonNullable<GetQuestionQuery["singleQuestion"]>

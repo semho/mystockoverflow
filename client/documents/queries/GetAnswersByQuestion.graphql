@@ -1,0 +1,10 @@
+query GetAnswersByQuestion($id: Int!) {
+  answersByQuestion(id: $id) {
+    answer
+    postedBy {
+      username
+    }
+    timestamp
+    id
+  }
+}
