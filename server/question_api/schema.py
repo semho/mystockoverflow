@@ -33,7 +33,7 @@ class Query(graphene.ObjectType):
     answers_by_question = graphene.List(AnswerType, id=graphene.Int(required=True))
 
     def resolve_answers(self, info, **kwargs):
-        return Answer.objects.all()
+        return Answer.objects.all().order_by("-timestamp")
 
     def resolve_single_answer(self, info, id):
         try:

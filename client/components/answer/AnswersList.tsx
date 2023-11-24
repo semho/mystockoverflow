@@ -54,9 +54,10 @@ export default function AnswersList({ questionId }: Props) {
       />
       <div className="p-5">
         {list && list?.length > 0 ? (
-          list?.map((answer) => (
+          list?.map((answer, index) => (
             <div key={answer?.id}>
               <Answer
+                index={index}
                 answer={answer}
                 onSubmitSuccess={handleAnswerFormSubmit}
                 updateAnswer={updateAnswer}
