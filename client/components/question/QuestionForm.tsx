@@ -20,6 +20,8 @@ import { CreateQuestionDocument } from "@/generates/gql/graphql"
 import createGraphQLClient from "@/lib/requestClient"
 import { useState } from "react"
 import { useSession } from "next-auth/react"
+import { useQuestionsStore } from "@/store/questions"
+import { getQuestions } from "./QuestionsList"
 
 const formSchema = z.object({
   title: z
@@ -45,9 +47,16 @@ export function QuestionForm() {
     },
   })
 
+  const { setList } = useQuestionsStore()
+  const fetchDataAndUpdate = async () => {
+    const newQuestions = await getQuestions()
+    setList(newQuestions)
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const res = await createQuestion(values.title, values.description)
     if (res) {
+      fetchDataAndUpdate()
       router.push("/")
     }
   }

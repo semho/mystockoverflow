@@ -104,12 +104,14 @@ export function AnswerForm({ questionId, onSubmitSuccess }: Props) {
   return (
     <div>
       <span className="text-xl mr-4">Комментарии</span>
-      <Button
-        onClick={toggleExpansion}
-        variant={isExpanded ? "outline" : "default"}
-      >
-        {isExpanded ? "Скрыть форму комментарий" : "Оставить комментарий"}
-      </Button>
+      {session.data?.user && (
+        <Button
+          onClick={toggleExpansion}
+          variant={isExpanded ? "outline" : "default"}
+        >
+          {isExpanded ? "Скрыть форму комментарий" : "Оставить комментарий"}
+        </Button>
+      )}
       <div className="content" style={contentStyles}>
         <Form {...form}>
           <form
