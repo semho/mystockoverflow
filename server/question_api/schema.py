@@ -30,6 +30,7 @@ class Query(graphene.ObjectType):
 
     answers = graphene.List(AnswerType)
     single_answer = graphene.Field(AnswerType, id=graphene.Int(required=True))
+    answers_by_question = graphene.List(AnswerType, id=graphene.Int(required=True))
 
     def resolve_answers(self, info, **kwargs):
         return Answer.objects.all()
@@ -39,6 +40,9 @@ class Query(graphene.ObjectType):
             return Answer.objects.get(id=id)
         except Answer.DoesNotExist:
             return None
+
+    def resolve_answers_by_question(self, info, id):
+        return Answer.objects.filter(question=id).all()
 
 
 class CreateQuestion(graphene.Mutation):
@@ -63,10 +67,14 @@ class CreateAnswer(graphene.Mutation):
 
     class Arguments:
         answer = graphene.String(required=True)
+        question_id = graphene.ID(required=True)
 
-    def mutate(self, info, answer):
+    def mutate(self, info, answer, question_id):
+        try:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise GraphQLError("Record not found")
         user = info.context.user
-        question = info.context.question
         if user.is_anonymous:
             return GraphQLError("You must Log in to create a new answer")
         answer = Answer(question=question, posted_by=user, answer=answer)
@@ -104,6 +112,32 @@ class UpdateQuestion(graphene.Mutation):
         return UpdateQuestion(question=question)
 
 
+class UpdateAnswer(graphene.Mutation):
+    answer = graphene.Field(AnswerType)
+
+    class Arguments:
+        answer_id = graphene.ID(required=True)
+        text = graphene.String()
+
+    def mutate(self, info, answer_id, text=None):
+        try:
+            answer = Answer.objects.get(pk=answer_id)
+        except Answer.DoesNotExist:
+            raise GraphQLError("Record not found")
+
+        user = info.context.user
+        if user.is_anonymous:
+            return GraphQLError("You must Log in to update a answer")
+        if answer.posted_by != user:
+            return GraphQLError("You do not have permission to update this answer")
+
+        if answer.answer is not None:
+            answer.answer = text
+        answer.save()
+
+        return UpdateAnswer(answer=answer)
+
+
 class DeleteQuestion(graphene.Mutation):
     question = graphene.Field(QuestionType)
 
@@ -118,13 +152,36 @@ class DeleteQuestion(graphene.Mutation):
 
         user = info.context.user
         if user.is_anonymous:
-            return GraphQLError("You must Log in to update a question")
+            return GraphQLError("You must Log in to delete a question")
         if question.created_by != user:
-            return GraphQLError("You do not have permission to update this question")
+            return GraphQLError("You do not have permission to delete this question")
 
         question.delete()
 
         return DeleteQuestion(question=None)
+
+
+class DeleteAnswer(graphene.Mutation):
+    answer = graphene.Field(AnswerType)
+
+    class Arguments:
+        answer_id = graphene.ID(required=True)
+
+    def mutate(self, info, answer_id):
+        try:
+            answer = Answer.objects.get(pk=answer_id)
+        except Answer.DoesNotExist:
+            raise GraphQLError("Record not found")
+
+        user = info.context.user
+        if user.is_anonymous:
+            return GraphQLError("You must Log in to delete a answer")
+        if answer.posted_by != user:
+            return GraphQLError("You do not have permission to delete this answer")
+
+        answer.delete()
+
+        return DeleteAnswer(answer=None)
 
 
 class Mutation(graphene.ObjectType):
@@ -132,3 +189,5 @@ class Mutation(graphene.ObjectType):
     update_question = UpdateQuestion.Field()
     delete_question = DeleteQuestion.Field()
     create_answer = CreateAnswer.Field()
+    update_answer = UpdateAnswer.Field()
+    delete_answer = DeleteAnswer.Field()
