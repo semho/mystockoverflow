@@ -22,6 +22,8 @@ import {
   DeleteQuestionResponse,
   GraphQLResponseError,
 } from "@/interfaces/rersponse"
+import { useQuestionsStore } from "@/store/questions"
+import { getQuestions } from "./QuestionsList"
 
 type Props = {
   question: NonNullable<GetQuestionQuery["singleQuestion"]>
@@ -51,12 +53,19 @@ export default function QuestionDetail({ question, id }: Props) {
     ],
   )
 
+  const { setList } = useQuestionsStore()
+  const fetchDataAndUpdate = async () => {
+    const newQuestions = await getQuestions()
+    setList(newQuestions)
+  }
+
   const handleUpdateQuestion = async (
     newTitle: string,
     newDescription: string,
   ) => {
     setUpdatedTitle(newTitle)
     setUpdatedDescription(newDescription)
+    fetchDataAndUpdate()
   }
 
   const deleteQuestion = async (id: number) => {

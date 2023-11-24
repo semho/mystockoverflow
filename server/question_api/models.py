@@ -28,6 +28,7 @@ class Answer(models.Model):
     )
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     answer = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f"{self.posted_by.username}-answer"

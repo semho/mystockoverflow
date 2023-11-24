@@ -25,26 +25,25 @@ import createGraphQLClient from "@/lib/requestClient"
 import { AnswerFormUpdate } from "./AnswerFormUpdate"
 
 type Props = {
+  index: number
   answer: NonNullable<GetAnswersByQuestionQuery["answersByQuestion"]>[number]
   onSubmitSuccess: () => void
   updateAnswer: () => void
 }
 
 export default function Answer({
+  index,
   answer,
   onSubmitSuccess,
   updateAnswer,
 }: Props) {
-  if (!answer) {
-    return null
-  }
   const [isAuthState, setIsAuthState] = useState(false)
   const [username, setUserName] = useState("")
   const [error, setError] = useState("")
   const session = useSession()
   const router = useRouter()
-  const dialog1 = `dialog1-comment-${answer.id}`
-  const dialog2 = `dialog2-comment-${answer.id}`
+  const dialog1 = `dialog1-comment-${answer!.id}`
+  const dialog2 = `dialog2-comment-${answer!.id}`
   const setDialogOpen = useDialogButtonStore((state) => state.setDialogOpen)
 
   // состояние кнопки submit в стор диалогово окна dialog2(удаление)
@@ -110,7 +109,7 @@ export default function Answer({
       {error && <div className="text-red-500 text-xs">{error}</div>}
       <CardHeader className="p-4">
         {answer?.id && (
-          <CardTitle className="text-xl">Ответ {answer?.id}</CardTitle>
+          <CardTitle className="text-xl">Ответ {index + 1}</CardTitle>
         )}
         <CardDescription>
           {new Date(answer?.timestamp).toLocaleDateString("ru-RU")}
