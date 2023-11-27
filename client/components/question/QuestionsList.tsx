@@ -15,19 +15,27 @@ export async function getQuestions(): Promise<GetQuestionsQuery["questions"]> {
   return response.questions
 }
 
-export default function QuestionsList() {
+export default function QuestionsList({
+  initialData,
+}: {
+  initialData: GetQuestionsQuery["questions"]
+}) {
   const { list, setList } = useQuestionsStore()
 
-  const fetchData = async () => {
-    const questions = await getQuestions()
-    if (questions) {
-      setList(questions)
-    }
-  }
-
   useEffect(() => {
-    fetchData()
-  }, [])
+    if (initialData) {
+      setList(initialData)
+    } else {
+      const fetchData = async () => {
+        const questions = await getQuestions()
+        if (questions) {
+          setList(questions)
+        }
+      }
+
+      fetchData()
+    }
+  }, [initialData])
 
   return (
     <div>
