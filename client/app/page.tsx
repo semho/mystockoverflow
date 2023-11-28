@@ -1,5 +1,6 @@
 import QuestionsList from "@/components/question/QuestionsList"
 import { GetQuestionsDocument } from "@/generates/gql/graphql"
+import { DEFAULT_SKIP, DEFAULT_TAKE } from "@/lib/constants"
 import createGraphQLClient from "@/lib/requestClient"
 import type { Metadata } from "next"
 
@@ -9,9 +10,14 @@ export const metadata: Metadata = {
 }
 
 async function getQuestions() {
-  return await createGraphQLClient().request(GetQuestionsDocument)
+  return await createGraphQLClient().request(GetQuestionsDocument, {
+    first: DEFAULT_TAKE,
+    skip: DEFAULT_SKIP,
+  })
 }
 export default async function Home() {
-  const { questions } = await getQuestions()
-  return <QuestionsList initialData={questions} />
+  const { questions, pagination } = await getQuestions()
+  return (
+    <QuestionsList initialData={questions} initialPagination={pagination} />
+  )
 }

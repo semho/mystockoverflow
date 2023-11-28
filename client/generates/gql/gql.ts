@@ -23,7 +23,7 @@ const documents = {
     "mutation UpdateQuestion($questionId: ID!, $title: String, $description: String) {\n  updateQuestion(\n    questionId: $questionId\n    title: $title\n    description: $description\n  ) {\n    question {\n      id\n    }\n  }\n}": types.UpdateQuestionDocument,
     "query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    answer\n    postedBy {\n      username\n    }\n    timestamp\n    id\n  }\n}": types.GetAnswersByQuestionDocument,
     "query GetQuestion($id: Int!) {\n  singleQuestion(id: $id) {\n    title\n    description\n    timestamp\n    createdBy {\n      username\n    }\n  }\n}": types.GetQuestionDocument,
-    "query GetQuestions {\n  questions {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n}": types.GetQuestionsDocument,
+    "query GetQuestions($first: Int, $skip: Int) {\n  questions(first: $first, skip: $skip) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}": types.GetQuestionsDocument,
 };
 
 /**
@@ -83,7 +83,7 @@ export function graphql(source: "query GetQuestion($id: Int!) {\n  singleQuestio
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetQuestions {\n  questions {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n}"): (typeof documents)["query GetQuestions {\n  questions {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n}"];
+export function graphql(source: "query GetQuestions($first: Int, $skip: Int) {\n  questions(first: $first, skip: $skip) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"): (typeof documents)["query GetQuestions($first: Int, $skip: Int) {\n  questions(first: $first, skip: $skip) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

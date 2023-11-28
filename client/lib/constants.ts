@@ -5,3 +5,6 @@ export const API = "/graphql-api/"
 export const BACKEND_SITE = `${BACKEND_HOST}:${BACKEND_PORT}`
 
 export const GRAPH_ENDPOINT = `${PROTOCOL}://${BACKEND_SITE}${API}`
+
+export const DEFAULT_TAKE = 5
+export const DEFAULT_SKIP = 0
