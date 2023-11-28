@@ -1,13 +1,40 @@
+from math import ceil
 import graphene
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from .models import Question, Answer
+from graphene import relay
+from django.db.models import Q
+
+# class QuestionType(DjangoObjectType):
+#     class Meta:
+#         model = Question
+#         interfaces = (relay.Node,)  # make sure you add this
+#         fields = "__all__"
 
 
-class QuestionType(DjangoObjectType):
-    class Meta:
-        model = Question
-        fields = ("id", "title", "description", "timestamp", "created_by")
+# class QuestionConnection(relay.Connection):
+#     class Meta:
+#         node = QuestionType
+
+
+# class AnswerType(DjangoObjectType):
+#     class Meta:
+#         model = Answer
+
+
+# class Query(graphene.ObjectType):
+#     questions = relay.ConnectionField(QuestionConnection)
+
+
+class PaginationType(graphene.ObjectType):
+    total_count = graphene.Int()
+    page_count = graphene.Int()
+    current_page = graphene.Int()
+    has_prev_page = graphene.Boolean()
+    has_next_page = graphene.Boolean()
+    first_page = graphene.String()
+    last_page = graphene.String()
 
 
 class AnswerType(DjangoObjectType):
@@ -15,12 +42,71 @@ class AnswerType(DjangoObjectType):
         model = Answer
 
 
-class Query(graphene.ObjectType):
-    questions = graphene.List(QuestionType)
-    single_question = graphene.Field(QuestionType, id=graphene.Int(required=True))
+class QuestionType(DjangoObjectType):
+    class Meta:
+        model = Question
+        fields = "__all__"
 
-    def resolve_questions(self, info, **kwargs):
-        return Question.objects.all().order_by("-timestamp")
+
+class Query(graphene.ObjectType):
+    questions = graphene.Field(
+        graphene.List(QuestionType),
+        first=graphene.Int(),
+        skip=graphene.Int(),
+        search=graphene.String(),
+    )
+
+    pagination = graphene.Field(PaginationType)
+
+    def resolve_questions(self, info, first=None, skip=None, search=None, **kwargs):
+        qs = Question.objects.all().order_by("-timestamp")
+
+        if search:
+            filter = Q(title__icontains=search) | Q(description__icontains=search)
+            qs = qs.filter(filter)
+
+        info.context.total_count = qs.count()
+
+        if skip:
+            qs = qs[skip:]
+            info.context.skip = skip
+
+        if first:
+            qs = qs[:first]
+            info.context.first = first
+
+        return qs
+
+    def resolve_pagination(self, info, **kwargs):
+        first = info.context.first if hasattr(info.context, "first") else 0
+        skip = info.context.skip if hasattr(info.context, "skip") else 0
+
+        total_count = (
+            info.context.total_count if hasattr(info.context, "total_count") else 1
+        )
+        page_size = first if first else total_count
+        total_pages = ceil(total_count / page_size)
+
+        current_page = (skip // page_size) + 1 if skip else 1
+        has_prev_page = current_page > 1
+        has_next_page = current_page < total_pages
+
+        first_page = f"?first={first}" if first else None
+        last_page = (
+            f"?first={first}&skip={(total_pages - 1) * page_size}" if first else None
+        )
+
+        return PaginationType(
+            total_count=total_count,
+            page_count=total_pages,
+            current_page=current_page,
+            has_prev_page=has_prev_page,
+            has_next_page=has_next_page,
+            first_page=first_page,
+            last_page=last_page,
+        )
+
+    single_question = graphene.Field(QuestionType, id=graphene.Int(required=True))
 
     def resolve_single_question(self, info, id):
         try:

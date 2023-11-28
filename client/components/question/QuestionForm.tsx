@@ -16,12 +16,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
-import { CreateQuestionDocument } from "@/generates/gql/graphql"
+import {
+  CreateQuestionDocument,
+  GetQuestionsDocument,
+} from "@/generates/gql/graphql"
 import createGraphQLClient from "@/lib/requestClient"
 import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useQuestionsStore } from "@/store/questions"
-import { getQuestions } from "./QuestionsList"
+import { DEFAULT_SKIP, DEFAULT_TAKE } from "@/lib/constants"
 
 const formSchema = z.object({
   title: z
@@ -49,8 +52,11 @@ export function QuestionForm() {
 
   const { setList } = useQuestionsStore()
   const fetchDataAndUpdate = async () => {
-    const newQuestions = await getQuestions()
-    setList(newQuestions)
+    const response = await createGraphQLClient().request(GetQuestionsDocument, {
+      first: DEFAULT_TAKE,
+      skip: DEFAULT_SKIP,
+    })
+    setList(response.questions)
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

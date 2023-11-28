@@ -1,5 +1,5 @@
-query GetQuestions {
-  questions {
+query GetQuestions($first: Int, $skip: Int) {
+  questions(first: $first, skip: $skip) {
     id
     title
     description
@@ -14,5 +14,14 @@ query GetQuestions {
       isStaff
       lastLogin
     }
+  }
+  pagination {
+    currentPage
+    totalCount
+    hasNextPage
+    hasPrevPage
+    firstPage
+    lastPage
+    pageCount
   }
 }

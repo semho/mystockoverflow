@@ -10,6 +10,7 @@ import {
 import {
   DeleteQuestionDocument,
   GetQuestionQuery,
+  GetQuestionsDocument,
 } from "@/generates/gql/graphql"
 import { DialogBox } from "../DialogBox"
 import { QuestionFormUpdate } from "./QuestionFormUpdate"
@@ -23,7 +24,7 @@ import {
   GraphQLResponseError,
 } from "@/interfaces/rersponse"
 import { useQuestionsStore } from "@/store/questions"
-import { getQuestions } from "./QuestionsList"
+import { DEFAULT_SKIP, DEFAULT_TAKE } from "@/lib/constants"
 
 type Props = {
   question: NonNullable<GetQuestionQuery["singleQuestion"]>
@@ -55,8 +56,11 @@ export default function QuestionDetail({ question, id }: Props) {
 
   const { setList } = useQuestionsStore()
   const fetchDataAndUpdate = async () => {
-    const newQuestions = await getQuestions()
-    setList(newQuestions)
+    const response = await createGraphQLClient().request(GetQuestionsDocument, {
+      first: DEFAULT_TAKE,
+      skip: DEFAULT_SKIP,
+    })
+    setList(response.questions)
   }
 
   const handleUpdateQuestion = async (
