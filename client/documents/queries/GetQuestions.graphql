@@ -1,5 +1,5 @@
-query GetQuestions($first: Int, $skip: Int) {
-  questions(first: $first, skip: $skip) {
+query GetQuestions($first: Int, $skip: Int, $search: String = "") {
+  questions(first: $first, skip: $skip, search: $search) {
     id
     title
     description

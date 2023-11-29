@@ -1,3 +1,4 @@
+import { Search } from "@/components/Search"
 import QuestionsList from "@/components/question/QuestionsList"
 import { GetQuestionsDocument } from "@/generates/gql/graphql"
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "@/lib/constants"
@@ -18,6 +19,9 @@ async function getQuestions() {
 export default async function Home() {
   const { questions, pagination } = await getQuestions()
   return (
-    <QuestionsList initialData={questions} initialPagination={pagination} />
+    <>
+      <Search />
+      <QuestionsList initialData={questions} initialPagination={pagination} />
+    </>
   )
 }

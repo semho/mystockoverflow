@@ -18,15 +18,9 @@ export default function QuestionsList({
   initialData: GetQuestionsQuery["questions"]
   initialPagination: GetQuestionsQuery["pagination"]
 }) {
-  const { list, setList } = useQuestionsStore()
+  const { list, setList, pagination, setPagination, search } =
+    useQuestionsStore()
   const [loading, setLoading] = useState(false)
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalCount: 0,
-    hasNextPage: false,
-    hasPrevPage: false,
-    pageCount: 1,
-  })
 
   useEffect(() => {
     if (initialData) {
@@ -34,10 +28,10 @@ export default function QuestionsList({
       setPagination((prev) => ({
         ...prev,
         currentPage: initialPagination?.currentPage || 1,
-        totalCount: initialPagination?.totalCount || 0,
+        pageCount: initialPagination?.pageCount || 1,
         hasNextPage: initialPagination?.hasNextPage || false,
         hasPrevPage: initialPagination?.hasPrevPage || false,
-        pageCount: initialPagination?.pageCount || 1,
+        totalCount: initialPagination?.totalCount || 0,
       }))
     } else {
       fetchData()
@@ -53,22 +47,22 @@ export default function QuestionsList({
         {
           first: DEFAULT_TAKE,
           skip: (pagination.currentPage - 1) * DEFAULT_TAKE,
+          search: search,
         },
       )
 
       const newQuestions: GetQuestionsQuery["questions"] = response.questions
       const newPagination: GetQuestionsQuery["pagination"] = response.pagination
-
       setList(newQuestions)
 
       if (newPagination) {
         setPagination((prev) => ({
           ...prev,
           currentPage: newPagination.currentPage || 1,
-          totalCount: newPagination.totalCount || 0,
-          hasNextPage: newPagination.hasNextPage || false,
-          asPrevPage: newPagination?.hasPrevPage || false,
           pageCount: newPagination.pageCount || 1,
+          hasNextPage: newPagination.hasNextPage || false,
+          hasPrevPage: newPagination.hasPrevPage || false,
+          totalCount: newPagination.totalCount || 0,
         }))
       }
     } catch (error) {
