@@ -128,7 +128,7 @@ class Query(graphene.ObjectType):
             return None
 
     def resolve_answers_by_question(self, info, id):
-        return Answer.objects.filter(question=id).all()
+        return Answer.objects.filter(question=id).filter(parent_answer__isnull=True)
 
 
 class CreateQuestion(graphene.Mutation):
@@ -164,6 +164,37 @@ class CreateAnswer(graphene.Mutation):
         if user.is_anonymous:
             return GraphQLError("You must Log in to create a new answer")
         answer = Answer(question=question, posted_by=user, answer=answer)
+        answer.save()
+
+        return CreateAnswer(answer=answer)
+
+
+class CreateAnswerToAnswer(graphene.Mutation):
+    answer = graphene.Field(AnswerType)
+
+    class Arguments:
+        answer = graphene.String(required=True)
+        question_id = graphene.ID(required=True)
+        parent_answer_id = graphene.ID(required=True)
+        responding_id = graphene.ID(required=True)
+
+    def mutate(self, info, answer, question_id, parent_answer_id, responding_id):
+        try:
+            question = Question.objects.get(pk=question_id)
+            parent_answer = Answer.objects.get(pk=parent_answer_id)
+            responding_to = Answer.objects.get(pk=responding_id)
+        except Question.DoesNotExist:
+            raise GraphQLError("Record not found")
+        user = info.context.user
+        if user.is_anonymous:
+            return GraphQLError("You must Log in to create a new answer")
+        answer = Answer(
+            question=question,
+            posted_by=user,
+            answer=answer,
+            parent_answer=parent_answer,
+            responding_to=responding_to,
+        )
         answer.save()
 
         return CreateAnswer(answer=answer)
@@ -275,5 +306,6 @@ class Mutation(graphene.ObjectType):
     update_question = UpdateQuestion.Field()
     delete_question = DeleteQuestion.Field()
     create_answer = CreateAnswer.Field()
+    create_answer_to_answer = CreateAnswerToAnswer.Field()
     update_answer = UpdateAnswer.Field()
     delete_answer = DeleteAnswer.Field()

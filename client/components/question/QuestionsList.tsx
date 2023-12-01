@@ -23,20 +23,21 @@ export default function QuestionsList({
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (initialData) {
-      setList(initialData)
-      setPagination((prev) => ({
-        ...prev,
-        currentPage: initialPagination?.currentPage || 1,
-        pageCount: initialPagination?.pageCount || 1,
-        hasNextPage: initialPagination?.hasNextPage || false,
-        hasPrevPage: initialPagination?.hasPrevPage || false,
-        totalCount: initialPagination?.totalCount || 0,
-      }))
-    } else {
-      fetchData()
+    const fetchDataAndSetState = async () => {
+      if (initialData) {
+        setList(initialData)
+        setPagination((prev) => ({
+          ...prev,
+          currentPage: initialPagination?.currentPage || 1,
+          pageCount: initialPagination?.pageCount || 1,
+          hasNextPage: initialPagination?.hasNextPage || false,
+          hasPrevPage: initialPagination?.hasPrevPage || false,
+          totalCount: initialPagination?.totalCount || 0,
+        }))
+      }
     }
-  }, [initialData, initialPagination])
+    fetchDataAndSetState()
+  }, [initialData, initialPagination, search])
 
   const fetchData = async () => {
     setLoading(true)
@@ -78,7 +79,7 @@ export default function QuestionsList({
 
   useEffect(() => {
     fetchData()
-  }, [pagination.currentPage])
+  }, [pagination.currentPage, search])
 
   if (loading) {
     return <p>Loading...</p>
@@ -91,7 +92,6 @@ export default function QuestionsList({
           <Question question={question} />
         </div>
       ))}
-
       {!loading && pagination.pageCount > 1 && (
         <Pagination
           currentPage={pagination.currentPage}

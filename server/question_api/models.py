@@ -26,6 +26,20 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, related_name="answer", on_delete=models.CASCADE
     )
+    parent_answer = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        related_name="child_replies",
+        on_delete=models.CASCADE,
+    )
+    responding_to = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        related_name="responses",
+        on_delete=models.CASCADE,
+    )
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     answer = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)

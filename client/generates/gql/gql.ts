@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "mutation CreateAnswer($comment: String!, $questionId: ID!) {\n  createAnswer(answer: $comment, questionId: $questionId) {\n    answer {\n      id\n      answer\n      timestamp\n      postedBy {\n        username\n      }\n    }\n  }\n}": types.CreateAnswerDocument,
+    "mutation CreateAnswerToAnswer($comment: String!, $questionId: ID!, $parentAnswerId: ID!, $respondingAnswerId: ID!) {\n  createAnswerToAnswer(\n    answer: $comment\n    parentAnswerId: $parentAnswerId\n    questionId: $questionId\n    respondingId: $respondingAnswerId\n  ) {\n    answer {\n      id\n      answer\n      timestamp\n      postedBy {\n        username\n      }\n    }\n  }\n}": types.CreateAnswerToAnswerDocument,
     "mutation CreateQuestion($title: String!, $description: String) {\n  createQuestion(title: $title, description: $description) {\n    question {\n      id\n      title\n    }\n  }\n}": types.CreateQuestionDocument,
     "mutation CreateUser($password: String!, $username: String!, $email: String!) {\n  createUser(password: $password, username: $username, email: $email) {\n    user {\n      id\n    }\n  }\n}": types.CreateUserDocument,
     "mutation DeleteAnswer($answerId: ID!) {\n  deleteAnswer(answerId: $answerId) {\n    answer {\n      id\n    }\n  }\n}": types.DeleteAnswerDocument,
@@ -21,7 +22,7 @@ const documents = {
     "mutation tokenAuth($password: String!, $login: String!) {\n  tokenAuth(password: $password, username: $login) {\n    payload\n    token\n    refreshExpiresIn\n  }\n}": types.TokenAuthDocument,
     "mutation UpdateAnswer($answerId: ID!, $text: String) {\n  updateAnswer(answerId: $answerId, text: $text) {\n    answer {\n      id\n    }\n  }\n}": types.UpdateAnswerDocument,
     "mutation UpdateQuestion($questionId: ID!, $title: String, $description: String) {\n  updateQuestion(\n    questionId: $questionId\n    title: $title\n    description: $description\n  ) {\n    question {\n      id\n    }\n  }\n}": types.UpdateQuestionDocument,
-    "query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    answer\n    postedBy {\n      username\n    }\n    timestamp\n    id\n  }\n}": types.GetAnswersByQuestionDocument,
+    "query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    id\n    answer\n    timestamp\n    postedBy {\n      username\n    }\n    childReplies {\n      answer\n      id\n      timestamp\n      postedBy {\n        username\n      }\n      parentAnswer {\n        id\n        postedBy {\n          username\n        }\n      }\n      respondingTo {\n        postedBy {\n          username\n        }\n      }\n    }\n    question {\n      id\n    }\n  }\n}": types.GetAnswersByQuestionDocument,
     "query GetQuestion($id: Int!) {\n  singleQuestion(id: $id) {\n    title\n    description\n    timestamp\n    createdBy {\n      username\n    }\n  }\n}": types.GetQuestionDocument,
     "query GetQuestions($first: Int, $skip: Int, $search: String = \"\") {\n  questions(first: $first, skip: $skip, search: $search) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}": types.GetQuestionsDocument,
 };
@@ -44,6 +45,10 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation CreateAnswer($comment: String!, $questionId: ID!) {\n  createAnswer(answer: $comment, questionId: $questionId) {\n    answer {\n      id\n      answer\n      timestamp\n      postedBy {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation CreateAnswer($comment: String!, $questionId: ID!) {\n  createAnswer(answer: $comment, questionId: $questionId) {\n    answer {\n      id\n      answer\n      timestamp\n      postedBy {\n        username\n      }\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation CreateAnswerToAnswer($comment: String!, $questionId: ID!, $parentAnswerId: ID!, $respondingAnswerId: ID!) {\n  createAnswerToAnswer(\n    answer: $comment\n    parentAnswerId: $parentAnswerId\n    questionId: $questionId\n    respondingId: $respondingAnswerId\n  ) {\n    answer {\n      id\n      answer\n      timestamp\n      postedBy {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation CreateAnswerToAnswer($comment: String!, $questionId: ID!, $parentAnswerId: ID!, $respondingAnswerId: ID!) {\n  createAnswerToAnswer(\n    answer: $comment\n    parentAnswerId: $parentAnswerId\n    questionId: $questionId\n    respondingId: $respondingAnswerId\n  ) {\n    answer {\n      id\n      answer\n      timestamp\n      postedBy {\n        username\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -75,7 +80,7 @@ export function graphql(source: "mutation UpdateQuestion($questionId: ID!, $titl
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    answer\n    postedBy {\n      username\n    }\n    timestamp\n    id\n  }\n}"): (typeof documents)["query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    answer\n    postedBy {\n      username\n    }\n    timestamp\n    id\n  }\n}"];
+export function graphql(source: "query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    id\n    answer\n    timestamp\n    postedBy {\n      username\n    }\n    childReplies {\n      answer\n      id\n      timestamp\n      postedBy {\n        username\n      }\n      parentAnswer {\n        id\n        postedBy {\n          username\n        }\n      }\n      respondingTo {\n        postedBy {\n          username\n        }\n      }\n    }\n    question {\n      id\n    }\n  }\n}"): (typeof documents)["query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    id\n    answer\n    timestamp\n    postedBy {\n      username\n    }\n    childReplies {\n      answer\n      id\n      timestamp\n      postedBy {\n        username\n      }\n      parentAnswer {\n        id\n        postedBy {\n          username\n        }\n      }\n      respondingTo {\n        postedBy {\n          username\n        }\n      }\n    }\n    question {\n      id\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

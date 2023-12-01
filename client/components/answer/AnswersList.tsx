@@ -5,7 +5,7 @@ import {
   GetAnswersByQuestionQuery,
 } from "@/generates/gql/graphql"
 import createGraphQLClient from "@/lib/requestClient"
-import Answer from "./Answer"
+import Answer, { AnswerType } from "./Answer"
 import { AnswerForm } from "./AnswerForm"
 import { useEffect, useState } from "react"
 type Props = {
@@ -23,14 +23,12 @@ async function getAnswers(
 }
 
 export default function AnswersList({ questionId }: Props) {
-  const [list, setList] = useState<
-    GetAnswersByQuestionQuery["answersByQuestion"]
-  >([])
+  const [list, setList] = useState<AnswerType[]>([])
 
   const fetchData = async () => {
     const answersByQuestion = await getAnswers(Number(questionId))
     if (answersByQuestion) {
-      setList(answersByQuestion)
+      setList(answersByQuestion as AnswerType[])
     }
   }
 
@@ -61,6 +59,7 @@ export default function AnswersList({ questionId }: Props) {
                 answer={answer}
                 onSubmitSuccess={handleAnswerFormSubmit}
                 updateAnswer={updateAnswer}
+                questionId={questionId}
               />
             </div>
           ))
