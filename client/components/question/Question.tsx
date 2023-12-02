@@ -8,11 +8,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { GetQuestionsQuery } from "@/generates/gql/graphql"
+import {
+  GetQuestionsByCurrentUserQuery,
+  GetQuestionsQuery,
+} from "@/generates/gql/graphql"
 import Link from "next/link"
 
 type Props = {
-  question: NonNullable<GetQuestionsQuery["questions"]>[number]
+  question:
+    | NonNullable<GetQuestionsQuery["questions"]>[number]
+    | NonNullable<
+        GetQuestionsByCurrentUserQuery["questionsByCurrentUser"]
+      >[number]
+}
+
+function isGetQuestionsQuery(
+  question: any,
+): question is NonNullable<GetQuestionsQuery["questions"]>[number] {
+  return question && "description" in question
 }
 
 export default function Question({ question }: Props) {
@@ -28,12 +41,17 @@ export default function Question({ question }: Props) {
           {new Date(question?.timestamp).toLocaleDateString("ru-RU")}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <p>{question?.description}</p>
-      </CardContent>
-      <CardFooter>
-        <p>Автор: {question?.createdBy.username}</p>
-      </CardFooter>
+
+      {isGetQuestionsQuery(question) && question && (
+        <CardContent>
+          <p>{question.description}</p>
+        </CardContent>
+      )}
+      {isGetQuestionsQuery(question) && question && (
+        <CardFooter>
+          <p>Автор: {question?.createdBy.username}</p>
+        </CardFooter>
+      )}
     </Card>
   )
 }

@@ -1,0 +1,16 @@
+query GetQuestionsByCurrentUser($first: Int, $skip: Int) {
+  questionsByCurrentUser(first: $first, skip: $skip) {
+    id
+    title
+    timestamp
+  }
+  pagination {
+    currentPage
+    totalCount
+    hasNextPage
+    hasPrevPage
+    firstPage
+    lastPage
+    pageCount
+  }
+}

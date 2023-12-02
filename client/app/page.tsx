@@ -1,6 +1,9 @@
 import { Search } from "@/components/Search"
 import QuestionsList from "@/components/question/QuestionsList"
-import { GetQuestionsDocument } from "@/generates/gql/graphql"
+import {
+  GetQuestionsByCurrentUserDocument,
+  GetQuestionsDocument,
+} from "@/generates/gql/graphql"
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "@/lib/constants"
 import createGraphQLClient from "@/lib/requestClient"
 import type { Metadata } from "next"

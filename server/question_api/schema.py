@@ -5,6 +5,7 @@ from graphql import GraphQLError
 from .models import Question, Answer
 from graphene import relay
 from django.db.models import Q
+from django.db.models import Subquery
 
 # class QuestionType(DjangoObjectType):
 #     class Meta:
@@ -113,6 +114,56 @@ class Query(graphene.ObjectType):
             return Question.objects.get(id=id)
         except Question.DoesNotExist:
             return None
+
+    questions_by_current_user = graphene.Field(
+        graphene.List(QuestionType),
+        first=graphene.Int(),
+        skip=graphene.Int(),
+    )
+
+    def resolve_questions_by_current_user(
+        self,
+        info,
+        first=None,
+        skip=None,
+    ):
+        user = info.context.user
+        if user.is_authenticated:
+            qs = Question.objects.filter(created_by=user)
+            info.context.total_count = qs.count()
+            if skip:
+                qs = qs[skip:]
+            info.context.skip = skip
+
+            if first:
+                qs = qs[:first]
+                info.context.first = first
+            return qs
+        else:
+            return []
+
+    questions_with_answers_by_user = graphene.Field(
+        graphene.List(QuestionType),
+        first=graphene.Int(),
+        skip=graphene.Int(),
+    )
+
+    def resolve_questions_with_answers_by_user(self, info, first=None, skip=None):
+        user = info.context.user
+        if user.is_authenticated:
+            subquery = Answer.objects.filter(posted_by=user).values("question_id")
+            qs = Question.objects.filter(id__in=Subquery(subquery))
+            info.context.total_count = qs.count()
+            if skip:
+                qs = qs[skip:]
+            info.context.skip = skip
+
+            if first:
+                qs = qs[:first]
+                info.context.first = first
+            return qs
+        else:
+            return []
 
     answers = graphene.List(AnswerType)
     single_answer = graphene.Field(AnswerType, id=graphene.Int(required=True))

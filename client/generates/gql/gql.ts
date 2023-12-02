@@ -25,6 +25,8 @@ const documents = {
     "query GetAnswersByQuestion($id: Int!) {\n  answersByQuestion(id: $id) {\n    id\n    answer\n    timestamp\n    postedBy {\n      username\n    }\n    childReplies {\n      answer\n      id\n      timestamp\n      postedBy {\n        username\n      }\n      parentAnswer {\n        id\n        postedBy {\n          username\n        }\n      }\n      respondingTo {\n        postedBy {\n          username\n        }\n      }\n    }\n    question {\n      id\n    }\n  }\n}": types.GetAnswersByQuestionDocument,
     "query GetQuestion($id: Int!) {\n  singleQuestion(id: $id) {\n    title\n    description\n    timestamp\n    createdBy {\n      username\n    }\n  }\n}": types.GetQuestionDocument,
     "query GetQuestions($first: Int, $skip: Int, $search: String = \"\") {\n  questions(first: $first, skip: $skip, search: $search) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}": types.GetQuestionsDocument,
+    "query GetQuestionsByCurrentUser($first: Int, $skip: Int) {\n  questionsByCurrentUser(first: $first, skip: $skip) {\n    id\n    title\n    timestamp\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}": types.GetQuestionsByCurrentUserDocument,
+    "query GetQuestionsWithAnswersByUser($first: Int, $skip: Int) {\n  questionsWithAnswersByUser(first: $first, skip: $skip) {\n    id\n    title\n    timestamp\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}": types.GetQuestionsWithAnswersByUserDocument,
 };
 
 /**
@@ -89,6 +91,14 @@ export function graphql(source: "query GetQuestion($id: Int!) {\n  singleQuestio
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "query GetQuestions($first: Int, $skip: Int, $search: String = \"\") {\n  questions(first: $first, skip: $skip, search: $search) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"): (typeof documents)["query GetQuestions($first: Int, $skip: Int, $search: String = \"\") {\n  questions(first: $first, skip: $skip, search: $search) {\n    id\n    title\n    description\n    timestamp\n    createdBy {\n      id\n      username\n      email\n      firstName\n      lastName\n      isActive\n      isStaff\n      lastLogin\n    }\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetQuestionsByCurrentUser($first: Int, $skip: Int) {\n  questionsByCurrentUser(first: $first, skip: $skip) {\n    id\n    title\n    timestamp\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"): (typeof documents)["query GetQuestionsByCurrentUser($first: Int, $skip: Int) {\n  questionsByCurrentUser(first: $first, skip: $skip) {\n    id\n    title\n    timestamp\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetQuestionsWithAnswersByUser($first: Int, $skip: Int) {\n  questionsWithAnswersByUser(first: $first, skip: $skip) {\n    id\n    title\n    timestamp\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"): (typeof documents)["query GetQuestionsWithAnswersByUser($first: Int, $skip: Int) {\n  questionsWithAnswersByUser(first: $first, skip: $skip) {\n    id\n    title\n    timestamp\n  }\n  pagination {\n    currentPage\n    totalCount\n    hasNextPage\n    hasPrevPage\n    firstPage\n    lastPage\n    pageCount\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
